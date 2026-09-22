@@ -64,7 +64,7 @@ private final UserRepository userRepository;
         address.setCountry(userRequest.getAddress().getCountry());
         address.setZipcode(userRequest.getAddress().getZipcode());
         user.setAddress(address);
-        userRepository.save(user);
+        user = userRepository.save(user);
         return mapUserToResponse(user);
     }
 
