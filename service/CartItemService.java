@@ -1,23 +1,26 @@
 package com.example.ecom_Application.service;
 
 import com.example.ecom_Application.dto.CartItemRequest;
+import com.example.ecom_Application.dto.CartItemResponse;
 import com.example.ecom_Application.entity.CartItem;
 import com.example.ecom_Application.entity.Product;
 import com.example.ecom_Application.entity.User;
 import com.example.ecom_Application.repository.CartRepository;
 import com.example.ecom_Application.repository.ProductRepository;
 import com.example.ecom_Application.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @RequiredArgsConstructor
 @Service
 public class CartItemService {
     private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
+    private final ProductRepository productRepository ;
     private final UserRepository userRepository;
 
     public Boolean addProduct(String userId, CartItemRequest request){
@@ -45,6 +48,31 @@ public class CartItemService {
           }
         }
         return true;
+    }
 
+    @Transactional
+    public  Boolean deleteItemFromCart(String userId,String productId){
+      return userRepository.findById(userId).map(
+              product->{
+                  productRepository.findById(productId).orElseThrow(()->new RuntimeException("No such product Exist  :  "));
+                  cartRepository.deleteByUserIdAndProductId(userId,productId);
+                  return true;
+              }
+      ).orElseThrow(()->new RuntimeException("Removal Request not Processed : "));
+    }
+
+    public List<CartItemResponse> fetchItemFromCart(String userId){
+        return userRepository.findById(userId).map(user->
+                cartRepository.findByUserId(user.getId()).stream().map(this::mapToResponse)
+        ).orElseThrow().toList();
+    }
+
+    public CartItemResponse mapToResponse(CartItem cartItem){
+        CartItemResponse response = new CartItemResponse();
+        response.setId(cartItem.getId());
+        response.setProductName(cartItem.getProduct().getName());
+        response.setQuantity(cartItem.getQuantity());
+        response.setPrice(cartItem.getPrice());
+        return response;
     }
 }
