@@ -14,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     @Query("SELECT p FROM product p where p.active = true AND p.stockQuantity>0 AND LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword,'%'))")
     List<Product>searchProduct(@Param("keyword") String keyword);
+
+
 }
