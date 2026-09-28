@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -58,7 +59,7 @@ public class OrderService {
     public OrderResponseDTO mapItemToOrderResponseDTO(Order order , List<CartItem> list){
         OrderResponseDTO response = new OrderResponseDTO();
         response.setId(order.getId());
-        response.setOrderDate(order.getCreatedAt());
+        response.setOrderDate(LocalDateTime.now());
         response.setOrderStatus(order.getOrderStatus());
         response.setTotal(order.getTotalAmount());
         response.setItems(mapOrderItemToResponseDTO(list));
